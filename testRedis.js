@@ -126,7 +126,10 @@ async function setRedisJson(object) {
     }
 
     try {
-        const z = await client.set('user', JSON.stringify(object))
+        const z = await client.json.set('testJSON', '$', {
+            name: 'test name here',
+            wins: 3
+        })
     } catch (error) {
         console.log(error)
     } finally {
@@ -141,13 +144,13 @@ async function getRedisJson(key) {
     if (!client.isOpen) {
         client.connect()
     }
-    const xx = await client.get(key)
-    const formattedValue = JSON.parse(xx)
-    console.log(formattedValue)
-    console.log(formattedValue.username) // get individual information like you normally would from JSON
-    // console.log("This type of variable contains a: " + typeof(JSON.parse(xx)))
+    const xx = await client.json.get(key)
+    console.log(xx) // get individual information like you normally would from JSON
+    console.log(xx.name) // get individual information like you normally would from JSON
+    console.log(xx.wins) // get individual information like you normally would from JSON
+    console.log("This type of variable contains a: " + typeof(xx))
     client.quit()
     console.log('\n')
 }
-setRedisJson(object)
-// getRedisJson('user')
+// setRedisJson(object)
+getRedisJson('testJSON')
