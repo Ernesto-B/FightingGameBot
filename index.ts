@@ -1,14 +1,15 @@
 // compile with `tsc (name of file)`, then run the js file
 const Discord = require('discord.js')
 import { createClient } from 'redis';
+require('dotenv').config()
 
 const discordClient = new Discord.Client();
 
 const redisClient = createClient({
-    password: '8FwY4BF6lOKNSGWISbqLAd9fNt9RREja',
+    password: process.env.redisClientPassword,
     socket: {
-        host: 'redis-16831.c89.us-east-1-3.ec2.redns.redis-cloud.com',
-        port: 16831
+        host: process.env.redisClientHost,
+        port: process.env.redisClientPort ? parseInt(process.env.redisClientPort) : undefined // Required for this to work in ts
     }
 });
 
