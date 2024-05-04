@@ -1,0 +1,59 @@
+{
+    "users": 
+    {
+        "username": "someAvocado395",
+        "joinDate": "05/03/2024",
+        "wins": 13,
+        "losses": 5,
+        "winRate": 60.7,
+        "rankedWins": 6,
+        "rankedLosses": 3,
+        "rankedWinRate": 46.5,
+        "eloPoints": 42,
+        "serverRanking": 5,
+        "highestServerRanking": 3,
+        "highestWinStreak": 7,
+        "currentWinStreak": 3,
+        "favoriteOpponent": "opponent2",
+        "tally": {
+            "opponent1": [5,2],
+            "opponent2": [6,4]
+        },
+        "clan":
+        {
+            "name": "Clan name here",
+            "image": "https://yt3.googleusercontent.com/wzEypbVsmY9BI-IbLwVius4UvC2rejtJB_PTXAdPpYXQ07EIjl5Ms55NCFq_dILwONpxrzE2xA=s900-c-k-c0x00ffffff-no-rj",
+            "leader": "opponent1",
+            "clan elo": 97,
+            "clan members": ["someAvocado395", "opponent1", "opponent2"]
+        }
+    },
+    {
+        "username": "cowMAN360",
+        "joinDate": "05/03/2024",
+        "wins": 13,
+        "losses": 5,
+        "winRate": 60.7,
+        "rankedWins": 6,
+        "rankedLosses": 3,
+        "rankedWinRate": 46.5,
+        "eloPoints": 42,
+        "serverRanking": 5,
+        "highestServerRanking": 3,
+        "highestWinStreak": 7,
+        "currentWinStreak": 3,
+        "favoriteOpponent": "opponent2",
+        "tally": {
+            "opponent1": [5,2],
+            "opponent2": [6,4]
+        },
+        "clan":
+        {
+            "name": "Clan name here",
+            "image": "https://yt3.googleusercontent.com/wzEypbVsmY9BI-IbLwVius4UvC2rejtJB_PTXAdPpYXQ07EIjl5Ms55NCFq_dILwONpxrzE2xA=s900-c-k-c0x00ffffff-no-rj",
+            "leader": "cowMAN360",
+            "clan elo": 97,
+            "clan members": ["cowMAN360", "opponent1", "opponent2"]
+        }
+    }
+}
