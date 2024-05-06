@@ -16,12 +16,12 @@ async function getAllUsers(server:string = "testServer", setting:number = 0): Pr
             // Fetch JSON data for each key
             const usersData:any[] = []
             for (const userKey of userKeys) {
-            const userData = await client.json.get(userKey);
-            usersData.push(userData)
-            // Log all retrieved JSON data
-            console.log('All Users:')
-            console.log(usersData)
-        }
+                const userData = await client.json.get(userKey);
+                usersData.push(userData)
+                // Log all retrieved JSON data
+                console.log('All Users:')
+                console.log(usersData)
+            }
         } else {
             console.log(usernames)
         }
@@ -93,26 +93,56 @@ async function profile(user:string, server:string = "testServer"): Promise<objec
 async function rankMatch(user1:string, user2:string, reaction:boolean, server:string = "testServer"): Promise<void> {
     console.log(`Logging ranked match for ${user1} and ${user2} in ${server}...`)
     try {
-        // determine who won
+        // determine who won, add a win or loss to each user's data
         const leftWinner = reaction
         if (leftWinner) {
+            // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
             console.log(`The winner is ${user1}`)
-            // get winner and add 1 to wins
+
             const winnerData = await client.json.get(`${server}:users:${user1}`)
             if (!winnerData) {
                 throw new Error(`User ${user1} not found`)
             }
-            // update the wins value
-            winnerData["wins"] = winnerData["wins"] + 1
+            winnerData["rankedWins"] = winnerData["rankedWins"] + 1
             await client.json.set(`${server}:users:${user1}`, "$", winnerData)
-            console.log(`wins updated for user ${user1} in ${server} to ${winnerData}`)
-            // CONTINUE HEREEEEEE
+            console.log(`Ranked wins updated for user ${user1} in ${server} to ${winnerData}`)
+            
+            const loserData = await client.json.get(`${server}:users:${user2}`)
+            if (!winnerData) {
+                throw new Error(`User ${user2} not found`)
+            }
+            loserData["rankedLosses"] = loserData["rankedLosses"] + 1
+            await client.json.set(`${server}:users:${user2}`, "$", loserData)
+            console.log(`Ranked losses updated for user ${user2} in ${server} to ${loserData}`)
+
+            // elo changes here
 
         } else {
+            // Same thing but other person is the winner
+            // user2 won, add 1 to their win count. user1 lost, add 1 to their losses count
+            console.log(`The winner is ${user2}`)
+
+            const winnerData = await client.json.get(`${server}:users:${user2}`)
+            if (!winnerData) {
+                throw new Error(`User ${user2} not found`)
+            }
+            winnerData["rankedWins"] = winnerData["rankedWins"] + 1
+            await client.json.set(`${server}:users:${user2}`, "$", winnerData)
+            console.log(`Ranked wins updated for user ${user2} in ${server} to ${winnerData}`)
+            
+            const loserData = await client.json.get(`${server}:users:${user1}`)
+            if (!winnerData) {
+                throw new Error(`User ${user1} not found`)
+            }
+            loserData["rankedLosses"] = loserData["rankedLosses"] + 1
+            await client.json.set(`${server}:users:${user1}`, "$", loserData)
+            console.log(`Ranked losses updated for user ${user1} in ${server} to ${loserData}`)
+
+            // elo changes here
 
         }
-
         // Make a new tally entry if users' first battle. Otherwise, add 1 to the existing score of the user
+        
         
     } catch (error) {
         console.log("There was an error logging the match info: " + error)
@@ -120,6 +150,7 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
         client.quit()
     }
 }
+rankMatch("Darth Weeder", "someAvocado395", true, "server123")
 
 
 // Log match between users. user1 should be whoever calls the function by default

@@ -110,22 +110,46 @@ function rankMatch(user1_1, user2_1, reaction_1) {
     return __awaiter(this, arguments, void 0, function* (user1, user2, reaction, server = "testServer") {
         console.log(`Logging ranked match for ${user1} and ${user2} in ${server}...`);
         try {
-            // determine who won
+            // determine who won, add a win or loss to each user's data
             const leftWinner = reaction;
             if (leftWinner) {
+                // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
                 console.log(`The winner is ${user1}`);
-                // get winner and add 1 to wins
                 const winnerData = yield client.json.get(`${server}:users:${user1}`);
                 if (!winnerData) {
                     throw new Error(`User ${user1} not found`);
                 }
-                // update the wins value
-                winnerData["wins"] = winnerData["wins"] + 1;
+                winnerData["rankedWins"] = winnerData["rankedWins"] + 1;
                 yield client.json.set(`${server}:users:${user1}`, "$", winnerData);
-                console.log(`wins updated for user ${user1} in ${server} to ${winnerData}`);
-                // CONTINUE HEREEEEEE
+                console.log(`Ranked wins updated for user ${user1} in ${server} to ${winnerData}`);
+                const loserData = yield client.json.get(`${server}:users:${user2}`);
+                if (!winnerData) {
+                    throw new Error(`User ${user2} not found`);
+                }
+                loserData["rankedLosses"] = loserData["rankedLosses"] + 1;
+                yield client.json.set(`${server}:users:${user2}`, "$", loserData);
+                console.log(`Ranked losses updated for user ${user2} in ${server} to ${loserData}`);
+                // elo changes here
             }
             else {
+                // Same thing but other person is the winner
+                // user2 won, add 1 to their win count. user1 lost, add 1 to their losses count
+                console.log(`The winner is ${user2}`);
+                const winnerData = yield client.json.get(`${server}:users:${user2}`);
+                if (!winnerData) {
+                    throw new Error(`User ${user2} not found`);
+                }
+                winnerData["rankedWins"] = winnerData["rankedWins"] + 1;
+                yield client.json.set(`${server}:users:${user2}`, "$", winnerData);
+                console.log(`Ranked wins updated for user ${user2} in ${server} to ${winnerData}`);
+                const loserData = yield client.json.get(`${server}:users:${user1}`);
+                if (!winnerData) {
+                    throw new Error(`User ${user1} not found`);
+                }
+                loserData["rankedLosses"] = loserData["rankedLosses"] + 1;
+                yield client.json.set(`${server}:users:${user1}`, "$", loserData);
+                console.log(`Ranked losses updated for user ${user1} in ${server} to ${loserData}`);
+                // elo changes here
             }
             // Make a new tally entry if users' first battle. Otherwise, add 1 to the existing score of the user
         }
@@ -137,6 +161,7 @@ function rankMatch(user1_1, user2_1, reaction_1) {
         }
     });
 }
+rankMatch("Darth Weeder", "someAvocado395", true, "server123");
 // Log match between users. user1 should be whoever calls the function by default
 function match(user1_1, user2_1) {
     return __awaiter(this, arguments, void 0, function* (user1, user2, server = "testServer") {
