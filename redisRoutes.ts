@@ -31,7 +31,7 @@ async function getAllUsers(server:string = "testServer", setting:number = 0): Pr
         client.quit()
     }
 }
-// getAllUsers("server123")
+//getAllUsers("server123")
 
 // Set up routes:
 // Adding new player to DB
@@ -123,7 +123,7 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
 
 
 // Log match between users. user1 should be whoever calls the function by default
-async function match(user1:string, user2:string, server:string = "testServer"): Promise<void> {
+async function match(user1:string, user2:string,server:string = "testServer"): Promise<void> {
     console.log(`Logging match for ${user1} and ${user2} in ${server}...`)
     try {
         
@@ -152,15 +152,31 @@ async function leaderboard(server:string = "testServer"): Promise<object> {
 
 
 // Get scores between two users
-async function matchHistory(user1:string, user2:string, server:string = "testServer"): Promise<object> {
+async function matchHistory(user1:string, user2:string, server:string = "testServer"): Promise<object|void> {
     console.log(`Getting match history for ${user1} and ${user2} in ${server}...`)
     try {
         
-        return {}
+        const userOne = await client.json.get(`${server}:users:${user1}`)
+        const userTwo = await client.json.get(`${server}:users:${user2}`)
+        if(!userOne || !userTwo){
+            throw new Error("User was not found in the database..")
+        } 
+        const matchHistory = await client.json.get(`${server}:users:${user1}`)
+        const tally = matchHistory["tally"][user2]
+
+        if(!tally){
+            throw new Error("There has been no matches between these players.")
+        }
+        console.log(tally)
+        
+        // get elo here 
+        return {tally}
     } catch (error) {
-        console.log("" + error)
-        return {}
+        console.log("There was an error retrieving the user's information: " + error)
+    
     } finally {
         client.quit()
     }
 }
+
+matchHistory("someAvocado395","Darth Weeder","server123")
