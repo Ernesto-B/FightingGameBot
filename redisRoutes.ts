@@ -179,4 +179,16 @@ async function matchHistory(user1:string, user2:string, server:string = "testSer
     }
 }
 
+async function setElo(){
+
+try {
+    
+} catch (error) {
+    console.log("" + error)
+}finally{
+    client.quit()
+}
+
+}
+
 matchHistory("someAvocado395","Darth Weeder","server123")
