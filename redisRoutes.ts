@@ -232,3 +232,16 @@ async function updateWinsLoss(winner:string, loser:string, ranked:boolean, serve
 
     return [winnerData, loserData]
 }
+
+
+async function setElo(){
+
+    try {
+        
+    } catch (error) {
+        console.log("" + error)
+    }finally{
+        client.quit()
+    }
+    
+    }
