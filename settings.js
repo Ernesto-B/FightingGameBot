@@ -1,16 +1,17 @@
+"use strict";
 // Code for elo algorithms and other settings
 function regularElo(user1Elo, user2Elo) {
     user1Elo += 2;
     user2Elo -= 1;
-    var list = [];
+    const list = [];
     list.push(user1Elo, user2Elo);
     return (list);
 }
 function complexElo(user1Elo, user2Elo) {
     //If user is higher elo than you, 
-    var k = 30;
-    var probabilityResult1 = complexProbability(user1Elo, user2Elo);
-    var probabilityResult2 = complexProbability(user2Elo, user1Elo);
+    const k = 30;
+    const probabilityResult1 = complexProbability(user1Elo, user2Elo);
+    const probabilityResult2 = complexProbability(user2Elo, user1Elo);
     try {
         user1Elo = user1Elo + k * (1 - probabilityResult2);
         user2Elo = user2Elo + k * (0 - probabilityResult1);
@@ -20,7 +21,7 @@ function complexElo(user1Elo, user2Elo) {
     catch (error) {
         console.log("There has been an error calculating these numbers: " + error);
     }
-    return [2, 2];
+    return [user1Elo, user2Elo];
 }
 complexElo(50, 100);
 //calculate user probability of winning

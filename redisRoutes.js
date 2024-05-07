@@ -150,6 +150,38 @@ function rankMatch(user1_1, user2_1, reaction_1) {
             }
             else {
                 // Same thing but other person is the winner
+                // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
+                console.log(`The winner is ${user2}`);
+                const updatedUserInfo = yield updateWinsLoss(user2, user1, true, server);
+                // Make a new tally key inside both user's tally object if users' first battle. Otherwise, add 1 to the existing tally object score of the user
+                const user2TallyValue = updatedUserInfo[0]["tally"][user1];
+                if (!user2TallyValue) {
+                    // If tally doesn't exist for user2, create it
+                    console.log(`Tally for ${user1} in ${user2} file doesnt exist. Making new tally entry...`);
+                    updatedUserInfo[0]["tally"][user1] = [1, 0]; // Create new tally entry
+                }
+                else {
+                    // If it does exist, increment user1's score in that tally
+                    console.log(`Tally found for ${user1} in ${user2} file. Updating changes...`);
+                    updatedUserInfo[0]["tally"][user1][0]++; // Increment user1's score in the tally
+                }
+                const user1TallyValue = updatedUserInfo[1]["tally"][user2];
+                if (!user1TallyValue) {
+                    // If tally doesn't exist for user1 in user2's tally, create it
+                    console.log(`Tally for ${user2} in ${user1} file doesnt exist. Making new tally entry...`);
+                    updatedUserInfo[1]["tally"][user2] = [0, 1]; // Create new tally entry
+                }
+                else {
+                    // If it does exist, increment user2's losses in that tally
+                    console.log(`Tally found for ${user2} in ${user1} file. Updating changes...`);
+                    updatedUserInfo[1]["tally"][user2][1]++; // Increment user2's losses in the tally
+                }
+                // Update the database with new tally values
+                yield client.json.set(`${server}:users:${user2}`, "$", updatedUserInfo[0]);
+                console.log(`Updated tally for ${user2}: ${JSON.stringify(updatedUserInfo[0].tally)}`);
+                yield client.json.set(`${server}:users:${user1}`, "$", updatedUserInfo[1]);
+                console.log(`Updated tally for ${user1}: ${JSON.stringify(updatedUserInfo[1].tally)}`);
+                // elo, win rate, win streak, fav opponent changes here
             }
         }
         catch (error) {
@@ -160,7 +192,7 @@ function rankMatch(user1_1, user2_1, reaction_1) {
         }
     });
 }
-// rankMatch("cowMAN360", "Darth Weeder", true, "server123")
+rankMatch("cowMAN360", "Darth Weeder", false, "server123");
 // Log match between users. user1 should be whoever calls the function by default
 function match(user1_1, user2_1, reaction_1) {
     return __awaiter(this, arguments, void 0, function* (user1, user2, reaction, server = "testServer") {
@@ -244,5 +276,17 @@ function updateWinsLoss(winner, loser, ranked, server) {
         yield client.json.set(`${server}:users:${loser}`, "$", loserData);
         console.log(`${lossType} updated for user ${loser} in ${server} to ${(JSON.stringify(loserData.lossType))}`);
         return [winnerData, loserData];
+    });
+}
+function setElo() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+        }
+        catch (error) {
+            console.log("" + error);
+        }
+        finally {
+            client.quit();
+        }
     });
 }

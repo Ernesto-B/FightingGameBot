@@ -135,7 +135,44 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
 
         } else {
             // Same thing but other person is the winner
-        
+                // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
+                console.log(`The winner is ${user2}`)
+    
+                const updatedUserInfo = await updateWinsLoss(user2, user1, true, server)
+    
+                // Make a new tally key inside both user's tally object if users' first battle. Otherwise, add 1 to the existing tally object score of the user
+                const user2TallyValue = updatedUserInfo[0]["tally"][user1]
+                if (!user2TallyValue) {
+                    // If tally doesn't exist for user2, create it
+                    console.log(`Tally for ${user1} in ${user2} file doesnt exist. Making new tally entry...`)
+                    updatedUserInfo[0]["tally"][user1] = [1, 0] // Create new tally entry
+                } else {
+                    // If it does exist, increment user1's score in that tally
+                    console.log(`Tally found for ${user1} in ${user2} file. Updating changes...`)
+                    updatedUserInfo[0]["tally"][user1][0]++ // Increment user1's score in the tally
+                }
+                
+                const user1TallyValue = updatedUserInfo[1]["tally"][user2];
+                if (!user1TallyValue) {
+                    // If tally doesn't exist for user1 in user2's tally, create it
+                    console.log(`Tally for ${user2} in ${user1} file doesnt exist. Making new tally entry...`)
+                    updatedUserInfo[1]["tally"][user2] = [0, 1] // Create new tally entry
+                } else {
+                    // If it does exist, increment user2's losses in that tally
+                    console.log(`Tally found for ${user2} in ${user1} file. Updating changes...`)
+                    updatedUserInfo[1]["tally"][user2][1]++ // Increment user2's losses in the tally
+                }
+                
+                // Update the database with new tally values
+                await client.json.set(`${server}:users:${user2}`, "$", updatedUserInfo[0])
+                console.log(`Updated tally for ${user2}: ${JSON.stringify(updatedUserInfo[0].tally)}`)
+    
+                await client.json.set(`${server}:users:${user1}`, "$", updatedUserInfo[1])
+                console.log(`Updated tally for ${user1}: ${JSON.stringify(updatedUserInfo[1].tally)}`)
+    
+                // elo, win rate, win streak, fav opponent changes here
+    
+            
         }
     } catch (error) {
         console.log("There was an error logging the match info: " + error)
@@ -143,7 +180,7 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
         client.quit()
     }
 }
-// rankMatch("cowMAN360", "Darth Weeder", true, "server123")
+rankMatch("cowMAN360", "Darth Weeder", false, "server123")
 
 
 // Log match between users. user1 should be whoever calls the function by default
@@ -234,14 +271,14 @@ async function updateWinsLoss(winner:string, loser:string, ranked:boolean, serve
 }
 
 
-async function setElo(){
+async function setElo() {
 
     try {
         
     } catch (error) {
         console.log("" + error)
-    }finally{
+    } finally {
         client.quit()
     }
     
-    }
+}
