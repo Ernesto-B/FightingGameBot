@@ -16,17 +16,10 @@
             "currentWinStreak": 3,
             "favoriteOpponent": "opponent2",
             "tally": {
-                "opponent1": [5,2],
-                "opponent2": [6,4]
+                "cowMAN360": [5,2],
+                "AndichTheGoon": [6,4]
             },
-            "clan":
-            {
-                "name": "Clan name here",
-                "image": "https://yt3.googleusercontent.com/wzEypbVsmY9BI-IbLwVius4UvC2rejtJB_PTXAdPpYXQ07EIjl5Ms55NCFq_dILwONpxrzE2xA=s900-c-k-c0x00ffffff-no-rj",
-                "leader": "opponent1",
-                "clan elo": 97,
-                "clan members": ["someAvocado395", "opponent1", "opponent2"]
-            }
+            "clanMembership": "Pokemon Clan"
         },
         {
             "username": "cowMAN360",
@@ -44,17 +37,19 @@
             "currentWinStreak": 3,
             "favoriteOpponent": "opponent2",
             "tally": {
-                "opponent1": [5,2],
-                "opponent2": [6,4]
+                "AndichTheGoon": [5,2],
+                "GabrielToro101": [6,4]
             },
-            "clan":
-            {
-                "name": "Clan name here",
-                "image": "https://yt3.googleusercontent.com/wzEypbVsmY9BI-IbLwVius4UvC2rejtJB_PTXAdPpYXQ07EIjl5Ms55NCFq_dILwONpxrzE2xA=s900-c-k-c0x00ffffff-no-rj",
-                "leader": "cowMAN360",
-                "clan elo": 97,
-                "clan members": ["cowMAN360", "opponent1", "opponent2"]
-            }
+            "clanMembership": "NULL"
+        }
+    ],
+    "clans": [
+        {
+            "name": "Pokemon Clan",
+            "image": "https://yt3.googleusercontent.com/wzEypbVsmY9BI-IbLwVius4UvC2rejtJB_PTXAdPpYXQ07EIjl5Ms55NCFq_dILwONpxrzE2xA=s900-c-k-c0x00ffffff-no-rj",
+            "leader": "someAvocado395",
+            "clan elo": 97,
+            "clan members": ["someAvocado395", "opponent1", "opponent2"]
         }
     ]
 }
