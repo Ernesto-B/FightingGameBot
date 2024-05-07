@@ -39,21 +39,21 @@ async function newUser(user:string, server:string = "testServer"): Promise<void>
     console.log(`Adding new user ${user} to ${server}...`)
     const defaultUser = {
         "username": user,
-        "joinDate": "",
-        "wins": 0,
-        "losses": 0,
-        "winRate": 0,
-        "rankedWins": 0,
-        "rankedLosses": 0,
-        "rankedWinRate": 0,
-        "eloPoints": 0,
-        "serverRanking": 0,
-        "highestServerRanking": 0,
-        "highestWinStreak": 0,
-        "currentWinStreak": 0,
+        "joinDate": "05/07/2024",
+        "wins": 46,
+        "losses": 23,
+        "winRate": 67,
+        "rankedWins": 8,
+        "rankedLosses": 2,
+        "rankedWinRate": 80,
+        "eloPoints": 46,
+        "serverRanking": 7,
+        "highestServerRanking": 3,
+        "highestWinStreak": 2,
+        "currentWinStreak": 1,
         "favoriteOpponent": "",
         "tally": {
-
+            "cowMAN360": [10,8]
         },
         "clanMembership": ""
     }
@@ -67,7 +67,7 @@ async function newUser(user:string, server:string = "testServer"): Promise<void>
         client.quit()
     }
 }
-// newUser("cowMAN360", "server123")
+// newUser("Ashwin", "server123")
 
 // PLAYER Routes:
 // Get specified user's profile... not sure if void is correct or not for return type if error
@@ -87,7 +87,7 @@ async function profile(user:string, server:string = "testServer"): Promise<objec
         client.quit()
     }
 }
-// profile("Darth Weeder", "server123")
+// profile("cowMAN360", "server123")
 
 // Log ranked match between users. user1 should be whoever calls the function by default
 async function rankMatch(user1:string, user2:string, reaction:boolean, server:string = "testServer"): Promise<void> {
@@ -99,71 +99,65 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
             // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
             console.log(`The winner is ${user1}`)
 
-            const winnerData = await client.json.get(`${server}:users:${user1}`)
-            if (!winnerData) {
-                throw new Error(`User ${user1} not found`)
-            }
-            winnerData["rankedWins"] = winnerData["rankedWins"] + 1
-            await client.json.set(`${server}:users:${user1}`, "$", winnerData)
-            console.log(`Ranked wins updated for user ${user1} in ${server} to ${winnerData}`)
-            
-            const loserData = await client.json.get(`${server}:users:${user2}`)
-            if (!winnerData) {
-                throw new Error(`User ${user2} not found`)
-            }
-            loserData["rankedLosses"] = loserData["rankedLosses"] + 1
-            await client.json.set(`${server}:users:${user2}`, "$", loserData)
-            console.log(`Ranked losses updated for user ${user2} in ${server} to ${loserData}`)
+            const updatedUserInfo = await updateWinsLoss(user1, user2, true, server)
 
-            // elo changes here
+            // Make a new tally key inside both user's tally object if users' first battle. Otherwise, add 1 to the existing tally object score of the user
+            const user1TallyValue = updatedUserInfo[0]["tally"][user2]
+            if (!user1TallyValue) {
+                // If tally doesn't exist for user2, create it
+                console.log(`Tally for ${user2} in ${user1} file doesnt exist. Making new tally entry...`)
+                updatedUserInfo[0]["tally"][user2] = [1, 0] // Create new tally entry
+            } else {
+                // If it does exist, increment user1's score in that tally
+                console.log(`Tally found for ${user2} in ${user1} file. Updating changes...`)
+                updatedUserInfo[0]["tally"][user2][0]++ // Increment user1's score in the tally
+            }
+            
+            const user2TallyValue = updatedUserInfo[1]["tally"][user1];
+            if (!user2TallyValue) {
+                // If tally doesn't exist for user1 in user2's tally, create it
+                console.log(`Tally for ${user1} in ${user2} file doesnt exist. Making new tally entry...`)
+                updatedUserInfo[1]["tally"][user1] = [0, 1] // Create new tally entry
+            } else {
+                // If it does exist, increment user2's losses in that tally
+                console.log(`Tally found for ${user1} in ${user2} file. Updating changes...`)
+                updatedUserInfo[1]["tally"][user1][1]++ // Increment user2's losses in the tally
+            }
+            
+            // Update the database with new tally values
+            await client.json.set(`${server}:users:${user1}`, "$", updatedUserInfo[0])
+            console.log(`Updated tally for ${user1}: ${JSON.stringify(updatedUserInfo[0].tally)}`)
+
+            await client.json.set(`${server}:users:${user2}`, "$", updatedUserInfo[1])
+            console.log(`Updated tally for ${user2}: ${JSON.stringify(updatedUserInfo[1].tally)}`)
+
+            // elo, win rate, win streak, fav opponent changes here
 
         } else {
             // Same thing but other person is the winner
-            // user2 won, add 1 to their win count. user1 lost, add 1 to their losses count
-            console.log(`The winner is ${user2}`)
-
-            const winnerData = await client.json.get(`${server}:users:${user2}`)
-            if (!winnerData) {
-                throw new Error(`User ${user2} not found`)
-            }
-            winnerData["rankedWins"] = winnerData["rankedWins"] + 1
-            await client.json.set(`${server}:users:${user2}`, "$", winnerData)
-            console.log(`Ranked wins updated for user ${user2} in ${server} to ${winnerData}`)
-            
-            const loserData = await client.json.get(`${server}:users:${user1}`)
-            if (!winnerData) {
-                throw new Error(`User ${user1} not found`)
-            }
-            loserData["rankedLosses"] = loserData["rankedLosses"] + 1
-            await client.json.set(`${server}:users:${user1}`, "$", loserData)
-            console.log(`Ranked losses updated for user ${user1} in ${server} to ${loserData}`)
-
-            // elo changes here
-
+        
         }
-        // Make a new tally entry if users' first battle. Otherwise, add 1 to the existing score of the user
-        
-        
     } catch (error) {
         console.log("There was an error logging the match info: " + error)
     } finally {
         client.quit()
     }
 }
-rankMatch("Darth Weeder", "someAvocado395", true, "server123")
+// rankMatch("cowMAN360", "Darth Weeder", true, "server123")
 
 
 // Log match between users. user1 should be whoever calls the function by default
-async function match(user1:string, user2:string,server:string = "testServer"): Promise<void> {
+async function match(user1:string, user2:string, reaction:boolean, server:string = "testServer"): Promise<void> {
     console.log(`Logging match for ${user1} and ${user2} in ${server}...`)
     try {
-        
+
     } catch (error) {
         console.log("" + error)
     } finally {
         client.quit()
     }
 }
+// match("cowMAN360", "Darth Weeder", true, "server123")
 
 
 // Create player leaderboard information from server information. Sort users by elo
@@ -209,5 +203,32 @@ async function matchHistory(user1:string, user2:string, server:string = "testSer
         client.quit()
     }
 }
+// matchHistory("cowMAN360", "Darth Weeder", "server123")
 
-matchHistory("someAvocado395","Darth Weeder","server123")
+// Helper functions:
+// Function that adds and removes wins/losses or rankedWins/rankedLosses for both users
+async function updateWinsLoss(winner:string, loser:string, ranked:boolean, server:string) {
+    // Checking if users exist in db
+    const winnerData = await client.json.get(`${server}:users:${winner}`)
+    if (!winnerData) {
+        throw new Error(`User ${winner} not found`)
+    }
+    const loserData = await client.json.get(`${server}:users:${loser}`)
+    if (!loserData) {
+        throw new Error(`User ${loser} not found`)
+    }
+
+    const winType = ranked === true ? "rankedWins" : "wins"
+    const lossType = ranked === true ? "rankedLosses" : "losses"
+
+    // Adding 1 to rankedWins cout and 1 to rankedLosses count for respective users
+    winnerData[winType] = winnerData[winType] + 1
+    await client.json.set(`${server}:users:${winner}`, "$", winnerData)
+    console.log(`${winType} updated for user ${winner} in ${server} to ${JSON.stringify(winnerData.winType)}`)
+
+    loserData[lossType] = loserData[lossType] + 1
+    await client.json.set(`${server}:users:${loser}`, "$", loserData)
+    console.log(`${lossType} updated for user ${loser} in ${server} to ${(JSON.stringify(loserData.lossType))}`)
+
+    return [winnerData, loserData]
+}
