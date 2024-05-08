@@ -191,9 +191,9 @@ function rankMatch(user1_1, user2_1, reaction_1) {
                     console.log("Logging ranked match for ".concat(user1, " and ").concat(user2, " in ").concat(server, "..."));
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 10, 11, 12]);
+                    _a.trys.push([1, 14, 15, 16]);
                     leftWinner = reaction;
-                    if (!leftWinner) return [3 /*break*/, 5];
+                    if (!leftWinner) return [3 /*break*/, 7];
                     // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
                     console.log("The winner is ".concat(user1));
                     return [4 /*yield*/, updateWinsLoss(user1, user2, true, server)
@@ -233,15 +233,23 @@ function rankMatch(user1_1, user2_1, reaction_1) {
                 case 4:
                     _a.sent();
                     console.log("Updated tally for ".concat(user2, ": ").concat(JSON.stringify(updatedUserInfo[1].tally)));
-                    return [3 /*break*/, 9];
+                    // elo, win rate, win streak, fav opponent changes here
+                    return [4 /*yield*/, updateStats(user1, server)];
                 case 5:
+                    // elo, win rate, win streak, fav opponent changes here
+                    _a.sent();
+                    return [4 /*yield*/, updateStats(user2, server)];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 13];
+                case 7:
                     // Same thing but other person is the winner
                     // user1 won, add 1 to their win count. user2 lost, add 1 to their losses count
                     console.log("The winner is ".concat(user2));
                     return [4 /*yield*/, updateWinsLoss(user2, user1, true, server)
                         // Make a new tally key inside both user's tally object if users' first battle. Otherwise, add 1 to the existing tally object score of the user
                     ];
-                case 6:
+                case 8:
                     updatedUserInfo = _a.sent();
                     user2TallyValue = updatedUserInfo[0]["tally"][user1];
                     if (!user2TallyValue) {
@@ -267,29 +275,37 @@ function rankMatch(user1_1, user2_1, reaction_1) {
                     }
                     // Update the database with new tally values
                     return [4 /*yield*/, client.json.set("".concat(server, ":users:").concat(user2), "$", updatedUserInfo[0])];
-                case 7:
+                case 9:
                     // Update the database with new tally values
                     _a.sent();
                     console.log("Updated tally for ".concat(user2, ": ").concat(JSON.stringify(updatedUserInfo[0].tally)));
                     return [4 /*yield*/, client.json.set("".concat(server, ":users:").concat(user1), "$", updatedUserInfo[1])];
-                case 8:
+                case 10:
                     _a.sent();
                     console.log("Updated tally for ".concat(user1, ": ").concat(JSON.stringify(updatedUserInfo[1].tally)));
-                    _a.label = 9;
-                case 9: return [3 /*break*/, 12];
-                case 10:
+                    // elo, win rate, win streak, fav opponent changes here
+                    return [4 /*yield*/, updateStats(user1, server)];
+                case 11:
+                    // elo, win rate, win streak, fav opponent changes here
+                    _a.sent();
+                    return [4 /*yield*/, updateStats(user2, server)];
+                case 12:
+                    _a.sent();
+                    _a.label = 13;
+                case 13: return [3 /*break*/, 16];
+                case 14:
                     error_4 = _a.sent();
                     console.log("There was an error logging the match info: " + error_4);
-                    return [3 /*break*/, 12];
-                case 11:
+                    return [3 /*break*/, 16];
+                case 15:
                     client.quit();
                     return [7 /*endfinally*/];
-                case 12: return [2 /*return*/];
+                case 16: return [2 /*return*/];
             }
         });
     });
 }
-// rankMatch("cowMAN360", "Darth Weeder", false, "server123")
+// rankMatch("cowMAN360", "Darth Weeder", true, "server123")
 // Log match between users. user1 should be whoever calls the function by default
 function match(user1_1, user2_1, reaction_1) {
     return __awaiter(this, arguments, void 0, function (user1, user2, reaction, server) {
@@ -483,4 +499,4 @@ function updateStats(username_1) {
         });
     });
 }
-updateStats("Ashwin", "server123");
+// updateStats("Ashwin", "server123")

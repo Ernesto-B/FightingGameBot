@@ -132,6 +132,8 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
             console.log(`Updated tally for ${user2}: ${JSON.stringify(updatedUserInfo[1].tally)}`)
 
             // elo, win rate, win streak, fav opponent changes here
+            await updateStats(user1, server)
+            await updateStats(user2, server)
 
         } else {
             // Same thing but other person is the winner
@@ -171,7 +173,8 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
                 console.log(`Updated tally for ${user1}: ${JSON.stringify(updatedUserInfo[1].tally)}`)
     
                 // elo, win rate, win streak, fav opponent changes here
-    
+                await updateStats(user1, server)
+                await updateStats(user2, server)
             
         }
     } catch (error) {
@@ -180,7 +183,7 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
         client.quit()
     }
 }
-// rankMatch("cowMAN360", "Darth Weeder", false, "server123")
+// rankMatch("cowMAN360", "Darth Weeder", true, "server123")
 
 
 // Log match between users. user1 should be whoever calls the function by default
