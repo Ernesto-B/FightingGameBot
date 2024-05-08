@@ -32,7 +32,8 @@ async function getAllUsers(server:string = "testServer", setting:number = 0): Pr
         client.quit()
     }
 }
-getAllUsers("server123")
+setElo("cowMAN360","Darth Weeder","regular","server123")
+getAllUsers("server123",1)
 
 // Set up routes:
 // Adding new player to DB
@@ -274,8 +275,14 @@ async function updateWinsLoss(winner:string, loser:string, ranked:boolean, serve
     return [winnerData, loserData]
 }
 
-
-async function setElo(winner:string,loser:string,ranked:boolean,server:string) {
+/**
+ * Function that sets elo based on a winner and a loser
+ * @param winner winner of the match 
+ * @param loser loser of the match
+ * @param setting 'regular' will give the regular elo, any other input will give the complex elo
+ * @param server server123
+ */
+async function setElo(winner:string,loser:string,setting:string,server:string) {
 
     const winnerData = await client.json.get(`${server}:users:${winner}`)
     if(!winnerData){
@@ -291,10 +298,17 @@ async function setElo(winner:string,loser:string,ranked:boolean,server:string) {
     //this sets the elo using the complex algorithm. Need to create one that does the same for the regular elo. 
     const winnerElo= winnerData["eloPoints"]
     const loserElo= loserData["eloPoints"]
-    const elos= elo(winnerElo,loserElo)
+    let elos: number[] = []
+
+    //check to see which elo setting is being used. 
+    if(setting === "regular"){
+        elos =elo.regularElo(winnerElo,loserElo)
+    }else{
+        elos= elo.complexElo(winnerElo,loserElo)
+    }
     
-    winnerData["eloPoints"] = elos[0]
-    loserData["eloPoints"] = elos[1]
+    winnerData["eloPoints"] = Math.round(elos[0])
+    loserData["eloPoints"] = Math.round(elos[1])
 
     await client.json.set(`${server}:users:${winner}`, "$", winnerData)
     console.log(`Elo updated for user ${winner} in ${server}`)
@@ -305,7 +319,7 @@ async function setElo(winner:string,loser:string,ranked:boolean,server:string) {
     } catch (error) {
         throw new Error("There was an error using the imported function"+ error)
     }
-        
+
 }
 //cowMAN360 24
 // Darth Weeder 46

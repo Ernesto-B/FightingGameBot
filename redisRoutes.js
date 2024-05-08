@@ -92,7 +92,8 @@ function getAllUsers() {
         });
     });
 }
-getAllUsers("server123");
+setElo("cowMAN360", "Darth Weeder", "s", "server123");
+getAllUsers("server123", 1);
 // Set up routes:
 // Adding new player to DB
 function newUser(user_1) {
@@ -428,7 +429,8 @@ function updateWinsLoss(winner, loser, ranked, server) {
         });
     });
 }
-function setElo(winner, loser, ranked, server) {
+//Function that sets elo based on a winner and a lsoer. 
+function setElo(winner, loser, setting, server) {
     return __awaiter(this, void 0, void 0, function () {
         var winnerData, loserData, winnerElo, loserElo, elos, error_6;
         return __generator(this, function (_a) {
@@ -451,8 +453,8 @@ function setElo(winner, loser, ranked, server) {
                     winnerElo = winnerData["eloPoints"];
                     loserElo = loserData["eloPoints"];
                     elos = elo(winnerElo, loserElo);
-                    winnerData["eloPoints"] = elos[0];
-                    loserData["eloPoints"] = elos[1];
+                    winnerData["eloPoints"] = Math.round(elos[0]);
+                    loserData["eloPoints"] = Math.round(elos[1]);
                     return [4 /*yield*/, client.json.set("".concat(server, ":users:").concat(winner), "$", winnerData)];
                 case 4:
                     _a.sent();
