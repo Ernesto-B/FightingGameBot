@@ -1,7 +1,14 @@
 // Code for elo algorithms and other settings
 function regularElo(user1Elo, user2Elo) {
     user1Elo += 5;
-    user2Elo -= 3;
+    //if loser has 0 elo then do not remove elo 
+    if (user2Elo !== 0) {
+        user2Elo -= 3;
+    }
+    // if winner has less elo then loser then add extra elo.
+    if (user1Elo < user2Elo) {
+        user1Elo = user1Elo + 2;
+    }
     var list = [];
     list.push(user1Elo, user2Elo);
     return (list);
@@ -34,4 +41,7 @@ function complexElo(user1Elo, user2Elo) {
 function complexProbability(user1Elo, user2Elo) {
     return ((1.0 * 1.0) / (1 + 1.0 * Math.pow(10, (1.0 * (user1Elo - user2Elo)) / 400)));
 }
-module.exports = complexElo;
+module.exports = {
+    complexElo: complexElo,
+    regularElo: regularElo
+};

@@ -92,7 +92,7 @@ function getAllUsers() {
         });
     });
 }
-setElo("cowMAN360", "Darth Weeder", "s", "server123");
+setElo("cowMAN360", "Darth Weeder", "regular", "server123");
 getAllUsers("server123", 1);
 // Set up routes:
 // Adding new player to DB
@@ -429,7 +429,13 @@ function updateWinsLoss(winner, loser, ranked, server) {
         });
     });
 }
-//Function that sets elo based on a winner and a lsoer. 
+/**
+ * Function that sets elo based on a winner and a loser
+ * @param winner winner of the match
+ * @param loser loser of the match
+ * @param setting 'regular' will give the regular elo, any other input will give the complex elo
+ * @param server server123
+ */
 function setElo(winner, loser, setting, server) {
     return __awaiter(this, void 0, void 0, function () {
         var winnerData, loserData, winnerElo, loserElo, elos, error_6;
@@ -452,7 +458,14 @@ function setElo(winner, loser, setting, server) {
                     _a.trys.push([3, 6, , 7]);
                     winnerElo = winnerData["eloPoints"];
                     loserElo = loserData["eloPoints"];
-                    elos = elo(winnerElo, loserElo);
+                    elos = [];
+                    //check to see which elo setting is being used. 
+                    if (setting === "regular") {
+                        elos = elo.regularElo(winnerElo, loserElo);
+                    }
+                    else {
+                        elos = elo.complexElo(winnerElo, loserElo);
+                    }
                     winnerData["eloPoints"] = Math.round(elos[0]);
                     loserData["eloPoints"] = Math.round(elos[1]);
                     return [4 /*yield*/, client.json.set("".concat(server, ":users:").concat(winner), "$", winnerData)];
