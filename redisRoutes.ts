@@ -180,7 +180,7 @@ async function rankMatch(user1:string, user2:string, reaction:boolean, server:st
         client.quit()
     }
 }
-rankMatch("cowMAN360", "Darth Weeder", false, "server123")
+// rankMatch("cowMAN360", "Darth Weeder", false, "server123")
 
 
 // Log match between users. user1 should be whoever calls the function by default
@@ -282,3 +282,51 @@ async function setElo() {
     }
     
 }
+
+// Function to recalculate user stats (win rate, fav opponent changes). UNTESTED
+async function updateStats(username: string, server: string = "testServer"): Promise<void> {
+    console.log("Updating user stats...")
+    try {
+        console.log(`Retrieving ${username}'s data from DB...`)
+        // Retrieve the user's data from the database
+        const userData = await client.json.get(`${server}:users:${username}`)
+        if (!userData) {
+            throw new Error(`User ${username} not found`)
+        }
+
+        console.log(`Calculating win rate...`)
+        // Calculate win rate
+        const totalMatches = userData.wins + userData.losses
+        const winRate = totalMatches > 0 ? (userData.wins / totalMatches) * 100 : 0
+
+        console.log(`Calculating ranked win rate...`)
+        // Calculate rankedWin rate
+        const totalRankedMatches = userData.rankedWins + userData.rankedLosses
+        const rankedWinRate = totalRankedMatches > 0 ? (userData.rankedWins / totalRankedMatches) * 100 : 0
+
+        console.log(`Determining favourite opponent...`)
+        // Find favorite opponent (opponent with most matches)
+        let favoriteOpponent = ""
+        let maxMatches = 0
+        for (const [opponent, matches] of Object.entries(userData.tally)) {
+            const totalMatches = (matches as [number, number])[0] + (matches as [number, number])[1]
+            if (totalMatches > maxMatches) {
+                maxMatches = totalMatches
+                favoriteOpponent = opponent
+            }
+        }
+
+        console.log(`Updating the DB...`)
+        // Update user data with recalculated statistics
+        userData.winRate = winRate.toFixed(2)
+        userData.rankedWinRate = rankedWinRate.toFixed(2)
+        userData.favoriteOpponent = favoriteOpponent
+
+        // Update the database with the recalculated user data
+        await client.json.set(`${server}:users:${username}`, "$", userData)
+        console.log(`Recalculated statistics for ${username}`)
+    } catch (error) {
+        console.log("Error recalculating user statistics: " + error)
+    }
+}
+// updateStats("Ashwin", "server123")
