@@ -1,6 +1,7 @@
 const { createClient } = require("redis");
 require("dotenv").config()
 const client = require('./redisClientFile.js');
+const elo = require("./settings.js")
 
 // Dev routes:
 // Viewing all user in specific server
@@ -31,7 +32,7 @@ async function getAllUsers(server:string = "testServer", setting:number = 0): Pr
         client.quit()
     }
 }
-//getAllUsers("server123")
+getAllUsers("server123")
 
 // Set up routes:
 // Adding new player to DB
@@ -274,17 +275,41 @@ async function updateWinsLoss(winner:string, loser:string, ranked:boolean, serve
 }
 
 
-async function setElo() {
+async function setElo(winner:string,loser:string,ranked:boolean,server:string) {
+
+    const winnerData = await client.json.get(`${server}:users:${winner}`)
+    if(!winnerData){
+        throw new Error (`User ${winner} not found`)
+    }
+
+    const loserData = await client.json.get(`${server}:users:${loser}`)
+    if(!loserData){
+        throw new Error (`User ${loser} not found`)
+    }
 
     try {
-        
-    } catch (error) {
-        console.log("" + error)
-    } finally {
-        client.quit()
-    }
+    //this sets the elo using the complex algorithm. Need to create one that does the same for the regular elo. 
+    const winnerElo= winnerData["eloPoints"]
+    const loserElo= loserData["eloPoints"]
+    const elos= elo(winnerElo,loserElo)
     
+    winnerData["eloPoints"] = elos[0]
+    loserData["eloPoints"] = elos[1]
+
+    await client.json.set(`${server}:users:${winner}`, "$", winnerData)
+    console.log(`Elo updated for user ${winner} in ${server}`)
+
+    await client.json.set(`${server}:users:${loser}`, "$", loserData)
+    console.log(`Elo updated for user ${loser} in ${server}`)
+
+    } catch (error) {
+        throw new Error("There was an error using the imported function"+ error)
+    }
+        
 }
+//cowMAN360 24
+// Darth Weeder 46
+//setElo("cowMAN360","Darth Weeder",true,"server123")
 
 // Function to recalculate user stats (win rate, fav opponent changes). UNTESTED
 async function updateStats(username: string, server: string = "testServer"): Promise<void> {

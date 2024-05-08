@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var createClient = require("redis").createClient;
 require("dotenv").config();
 var client = require('./redisClientFile.js');
+var elo = require("./settings.js");
 // Dev routes:
 // Viewing all user in specific server
 function getAllUsers() {
@@ -91,7 +92,7 @@ function getAllUsers() {
         });
     });
 }
-//getAllUsers("server123")
+getAllUsers("server123");
 // Set up routes:
 // Adding new player to DB
 function newUser(user_1) {
@@ -427,25 +428,55 @@ function updateWinsLoss(winner, loser, ranked, server) {
         });
     });
 }
-function setElo() {
+function setElo(winner, loser, ranked, server) {
     return __awaiter(this, void 0, void 0, function () {
+        var winnerData, loserData, winnerElo, loserElo, elos, error_6;
         return __generator(this, function (_a) {
-            try {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, client.json.get("".concat(server, ":users:").concat(winner))];
+                case 1:
+                    winnerData = _a.sent();
+                    if (!winnerData) {
+                        throw new Error("User ".concat(winner, " not found"));
+                    }
+                    return [4 /*yield*/, client.json.get("".concat(server, ":users:").concat(loser))];
+                case 2:
+                    loserData = _a.sent();
+                    if (!loserData) {
+                        throw new Error("User ".concat(loser, " not found"));
+                    }
+                    _a.label = 3;
+                case 3:
+                    _a.trys.push([3, 6, , 7]);
+                    winnerElo = winnerData["eloPoints"];
+                    loserElo = loserData["eloPoints"];
+                    elos = elo(winnerElo, loserElo);
+                    winnerData["eloPoints"] = elos[0];
+                    loserData["eloPoints"] = elos[1];
+                    return [4 /*yield*/, client.json.set("".concat(server, ":users:").concat(winner), "$", winnerData)];
+                case 4:
+                    _a.sent();
+                    console.log("Elo updated for user ".concat(winner, " in ").concat(server));
+                    return [4 /*yield*/, client.json.set("".concat(server, ":users:").concat(loser), "$", loserData)];
+                case 5:
+                    _a.sent();
+                    console.log("Elo updated for user ".concat(loser, " in ").concat(server));
+                    return [3 /*break*/, 7];
+                case 6:
+                    error_6 = _a.sent();
+                    throw new Error("There was an error using the imported function" + error_6);
+                case 7: return [2 /*return*/];
             }
-            catch (error) {
-                console.log("" + error);
-            }
-            finally {
-                client.quit();
-            }
-            return [2 /*return*/];
         });
     });
 }
+//cowMAN360 24
+// Darth Weeder 46
+//setElo("cowMAN360","Darth Weeder",true,"server123")
 // Function to recalculate user stats (win rate, fav opponent changes). UNTESTED
 function updateStats(username_1) {
     return __awaiter(this, arguments, void 0, function (username, server) {
-        var userData, totalMatches, winRate, totalRankedMatches, rankedWinRate, favoriteOpponent, maxMatches, _i, _a, _b, opponent, matches, totalMatches_1, error_6;
+        var userData, totalMatches, winRate, totalRankedMatches, rankedWinRate, favoriteOpponent, maxMatches, _i, _a, _b, opponent, matches, totalMatches_1, error_7;
         if (server === void 0) { server = "testServer"; }
         return __generator(this, function (_c) {
             switch (_c.label) {
@@ -491,8 +522,8 @@ function updateStats(username_1) {
                     console.log("Recalculated statistics for ".concat(username));
                     return [3 /*break*/, 5];
                 case 4:
-                    error_6 = _c.sent();
-                    console.log("Error recalculating user statistics: " + error_6);
+                    error_7 = _c.sent();
+                    console.log("Error recalculating user statistics: " + error_7);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];
             }
